@@ -20,7 +20,8 @@ export default function TimelineModal({ onClose }) {
     let ev = events
     if (onlyMilestones) ev = ev.filter((e) => e.type === 'milestone')
     if (range > 0) {
-      const cutoff = Date.now() - range * 24 * 60 * 60 * 1000
+      const now = Date.now()
+      const cutoff = now - range * 24 * 60 * 60 * 1000
       ev = ev.filter((e) => e.at >= cutoff)
     }
     return ev

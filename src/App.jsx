@@ -15,8 +15,18 @@ function useIsMobile(bp = 1024) {
   useEffect(() => {
     const m = window.matchMedia(`(max-width: ${bp}px)`)
     const onChange = () => setIsMobile(m.matches)
-    m.addEventListener ? m.addEventListener('change', onChange) : m.addListener(onChange)
-    return () => m.removeEventListener ? m.removeEventListener('change', onChange) : m.removeListener(onChange)
+    if (m.addEventListener) {
+      m.addEventListener('change', onChange)
+    } else {
+      m.addListener(onChange)
+    }
+    return () => {
+      if (m.removeEventListener) {
+        m.removeEventListener('change', onChange)
+      } else {
+        m.removeListener(onChange)
+      }
+    }
   }, [bp])
   return isMobile
 }
@@ -52,7 +62,9 @@ function Workspace() {
   }, [selectedNodeId, isMobile])
 
   useEffect(() => {
-    if (!isMobile) setDrawer('none')
+    if (!isMobile) {
+      setDrawer((prev) => (prev !== 'none' ? 'none' : prev))
+    }
   }, [isMobile])
 
   if (!isMobile) {
@@ -176,12 +188,7 @@ export default function App() {
   const hydrate = useCaseFile((s) => s.hydrate)
   const activeId = useCaseFile((s) => s.activeId)
   const [unlocked, setUnlocked] = useState(false)
-  const [checked, setChecked] = useState(false)
-
-  useEffect(() => {
-    // decide if lock is needed — always gate first start (one-time setup)
-    setChecked(true)
-  }, [])
+  const [checked] = useState(true)
 
   useEffect(() => {
     if (checked && unlocked) hydrate()

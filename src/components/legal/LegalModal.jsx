@@ -33,16 +33,24 @@ function Section({ content }) {
 }
 
 export default function LegalModal({ initialTab = 'privacy', onClose }) {
-  const [tab, setTab] = useState(initialTab)
-
-  useEffect(() => setTab(initialTab), [initialTab])
+  const [tab, setTab] = useState(() => {
+    try {
+      const fromHash = window.location.hash.replace(/^#/, '')
+      if (fromHash && TABS.some((t) => t.id === fromHash)) return fromHash
+    } catch {}
+    return initialTab
+  })
 
   useEffect(() => {
     try {
       const fromHash = window.location.hash.replace(/^#/, '')
-      if (fromHash && TABS.some((t) => t.id === fromHash)) setTab(fromHash)
+      if (fromHash && TABS.some((t) => t.id === fromHash)) {
+        setTab(fromHash)
+      } else {
+        setTab(initialTab)
+      }
     } catch {}
-  }, [])
+  }, [initialTab])
 
   useEffect(() => {
     try { if (tab) window.location.hash = tab } catch {}
